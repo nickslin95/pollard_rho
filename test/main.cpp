@@ -1,10 +1,3 @@
-/*
-p -- характеристика поля, q -- порядок группы точек. p и  q -- простые
-2^40: p = 1099511627791, a = 490064540513, b = 170079681745, q = 1099513257113
-2^48: p = 281474976710677, a = 187997080572537, b = 198915293914922, q = 281474987479363
-2^56: p = 72057594037928017, a = 15222514519776677, b = 7110318376978981, q = 72057594089783747
-*/
-
 #include <cstdint>
 #include <cassert>
 #include <iostream>
@@ -18,15 +11,17 @@ p -- характеристика поля, q -- порядок группы т�
 
 static std::mt19937 gen(42);
 
-ECPoint<LongInt> GetRandomPoint(const EllipticCurve<LongInt>& ec, int64_t p) {
+template <class Int>
+ECPoint<Int> GetRandomPoint(const EllipticCurve<Int>& ec, int64_t p) {
     std::uniform_int_distribution<int64_t> dist(1, p - 1);
-    LongInt x, y;
+    Int x, y;
     do {
-        x = LongInt{dist(gen)};
-        FieldElem<LongInt> X(x);
-        FieldElem<LongInt> S = X * X * X + FieldElem(ec.A()) * X + FieldElem(ec.B());
-        LongInt y = TonelliShanks(S.GetVal(), ec.Prime());
-    } while (y != LongInt{-1});
+        x = Int{dist(gen)};
+        FieldElem<Int> X(x);
+        FieldElem<Int> S = X * X * X + FieldElem(ec.A()) * X + FieldElem(ec.B());
+        y = TonelliShanks(S.GetVal(), ec.Prime());
+    } while (y == Int{-1});
+    assert((y * y) % Int{p} == (x * x * x + ec.A() * x + ec.B()) % Int{p});
     ECPoint P(x, y);
     return P;
 }
@@ -34,9 +29,9 @@ ECPoint<LongInt> GetRandomPoint(const EllipticCurve<LongInt>& ec, int64_t p) {
 void CheckDiscreteLogarithmOnEllipticCurve(int64_t p, int64_t a, int64_t b, int64_t q) {
     EllipticCurve<LongInt> ec(LongInt{a}, LongInt{b}, LongInt{p}, LongInt{q});
     ECPoint<LongInt>::SetEllipticCurve(ec);
-    ECPoint<LongInt> P = GetRandomPoint(ec, p);
-    ECPoint<LongInt> Q = GetRandomPoint(ec, p);
-    DiscreteLogarithmFinder<ECPoint<LongInt>> dl_finder(P, Q, q);
+    ECPoint<LongInt> P = GetRandomPoint<LongInt>(ec, p);
+    ECPoint<LongInt> Q = GetRandomPoint<LongInt>(ec, p);
+    DiscreteLogarithmFinder<ECPoint<LongInt>, LongInt> dl_finder(P, Q, q);
     auto res = dl_finder.Find();
     assert(P.Power(res) == Q);
 }

@@ -19,6 +19,8 @@ Int LegendreSymbol(Int a, Int p) {
     return (ls == p - Int{1}) ? Int{-1} : ls;
 }
 
+
+// find square root of a modulo p
 template <class Int>
 Int TonelliShanks(Int a, Int p) {
     if (LegendreSymbol(a, p) != Int{1})

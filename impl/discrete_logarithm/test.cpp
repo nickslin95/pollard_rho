@@ -125,7 +125,7 @@ ECPoint<Int> GetRandomPoint(const EllipticCurve<Int>& ec, int64_t p) {
         FieldElem<Int> S = X * X * X + FieldElem(ec.A()) * X + FieldElem(ec.B());
         y = TonelliShanks(S.GetVal(), ec.Prime());
     } while (y == Int{-1});
-    assert((y * y) % p == (x * x * x + ec.A() * x + ec.B()) % p);
+    assert((y * y) % Int{p} == (x * x * x + ec.A() * x + ec.B()) % Int{p});
     ECPoint P(x, y);
     return P;
 }

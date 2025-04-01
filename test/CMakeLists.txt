@@ -1,0 +1,2 @@
+add_executable(main_test main.cpp)
+target_link_libraries(main_test PRIVATE discrete_logarithm elliptic_curve extended_euclidean long_arithmetic)
